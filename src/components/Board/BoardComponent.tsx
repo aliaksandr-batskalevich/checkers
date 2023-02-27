@@ -70,8 +70,8 @@ export const BoardComponent: FC<BoardPropsType> = ({board, setBoard}) => {
     const lettersArr = ['', '0', '1', '2', '3', '4', '5', '6', '7', ''];
     const numbersArr = [7, 6, 5, 4, 3, 2, 1, 0];
 
-    const lettersToRender = lettersArr.map(l => <div>{l}</div>);
-    const numbersToRender = numbersArr.map(num => <div>{num}</div>);
+    const lettersToRender = lettersArr.map((l, index) => <div key={index}>{l}</div>);
+    const numbersToRender = numbersArr.map((num, index) => <div key={index}>{num}</div>);
 
     return (
         <div className={s.boardWrapper}>
