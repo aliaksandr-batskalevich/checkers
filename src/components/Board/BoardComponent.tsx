@@ -30,7 +30,7 @@ export const BoardComponent: FC<BoardPropsType> = ({board, setBoard}) => {
 
 
         // move to target cell
-        if (cell.available) {
+        if (cell.isAvailable) {
             let figure = selectedCell?.figure;
             selectedCell?.moveFigure(cell);
             setSelectedCell(null);
@@ -41,8 +41,14 @@ export const BoardComponent: FC<BoardPropsType> = ({board, setBoard}) => {
         updateBoard();
     };
 
+    const getCellDanger = () => {
+        board.getCellDanger(selectedCell);
+        updateBoard();
+    }
+
     useEffect(() => {
         getCellAvailable();
+        getCellDanger();
     }, [selectedCell]);
 
     const boardToRender = board.cells.map(row =>
@@ -56,9 +62,28 @@ export const BoardComponent: FC<BoardPropsType> = ({board, setBoard}) => {
         </React.Fragment>
     );
 
+    // arrays for app
+    // const lettersArr = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', ''];
+    // const numbersArr = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    // arrays for development
+    const lettersArr = ['', '0', '1', '2', '3', '4', '5', '6', '7', ''];
+    const numbersArr = [7, 6, 5, 4, 3, 2, 1, 0];
+
+    const lettersToRender = lettersArr.map(l => <div>{l}</div>);
+    const numbersToRender = numbersArr.map(num => <div>{num}</div>);
+
     return (
         <div className={s.boardWrapper}>
-            {boardToRender}
+            <div className={s.lettersRow}>{lettersToRender}</div>
+            <div className={s.mainRowWrapper}>
+                <div className={s.numbersWrapper}>{numbersToRender}</div>
+                <div className={s.cellsWrapper}>
+                    {boardToRender}
+                </div>
+                <div className={s.numbersWrapper}>{numbersToRender}</div>
+            </div>
+            <div className={s.lettersRow}>{lettersToRender}</div>
         </div>
     );
 };

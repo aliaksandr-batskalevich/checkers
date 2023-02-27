@@ -43,7 +43,17 @@ export class Board {
             const row = this.cells[i];
             for (let j = 0; j < row.length; j++) {
                 const target = row[j];
-                target.available = !!selectedCell?.figure?.canMove(target);
+                target.isAvailable = !!selectedCell?.figure?.canMove(target);
+            }
+        }
+    }
+
+    public getCellDanger(selectedCell: Cell | null) {
+        for (let i = 0; i < this.cells.length; i++) {
+            const row = this.cells[i];
+            for (let j = 0; j < row.length; j++) {
+                const target = row[j];
+                target.isDanger = !!selectedCell?.figure?.canCrush(target, this);
             }
         }
     }

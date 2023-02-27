@@ -15,12 +15,8 @@ export class King extends Figure {
 
     canMove(target: Cell): boolean {
 
-        const conditionWhite = (!target.figure || target.figure.color === Colors.BLACK);
-        const conditionBlack = (!target.figure || target.figure.color === Colors.WHITE);
-        const colorCondition = this.color === Colors.WHITE ? conditionWhite : conditionBlack;
-
         const condition = target.color === Colors.BLACK
-            && colorCondition
+            && !target.figure
             && Math.abs(target.y - this.cell.y) === Math.abs(target.x - this.cell.x);
 
         return condition;

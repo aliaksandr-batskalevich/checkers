@@ -11,7 +11,9 @@ export class Cell {
     readonly y: number;
     readonly color: Colors;
     figure: Figure | null;
-    available: boolean;
+
+    isAvailable: boolean;
+    isDanger: boolean
 
     constructor(board: Board, x: number, y: number, color: Colors, figure: Figure | null) {
         this.id = v1();
@@ -20,16 +22,18 @@ export class Cell {
         this.y = y;
         this.color = color;
         this.figure = figure;
-        this.available = false;
+
+        this.isAvailable = false;
+        this.isDanger = false;
     };
 
     moveFigure(target: Cell) {
-        if (this.figure && this.figure.canMove(target)) {
-            this.figure.moveFigure(target);
+        if (this.figure) {
+            this.figure.moveFigure(target, this.board);
             target.figure = this.figure;
             this.figure = null;
 
-            // transform figure
+            // transform figure in KING
             if (target.y === 0 && target.figure.color === Colors.BLACK
             || target.y === 7 && target.figure.color === Colors.WHITE) {
                 target.transformFigure();

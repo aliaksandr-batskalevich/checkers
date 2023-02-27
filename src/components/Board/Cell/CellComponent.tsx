@@ -18,15 +18,16 @@ export const CellComponent: FC<CellComponentPropsType> = ({cell, isSelected, cel
 
     const colorClassName = isSelected
         ? s.selected
-        : cell.available && cell.figure
+        : cell.isDanger && cell.figure
             ? s.crush
             : cell.color === Colors.WHITE
                 ? s.white
                 : s.black;
+
     const selectedClassName = isSelected ? s.selected : '';
     const rootClassName = `${s.cellWrapper} ${colorClassName} ${selectedClassName}`;
 
-    const isAvailable = !cell.figure && cell.available;
+    const isAvailable = !cell.figure && cell.isAvailable;
 
     const figure = cell.figure?.logo ? <img src={cell.figure.logo} alt="figure"/> : null;
 
