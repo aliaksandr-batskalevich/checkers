@@ -1,0 +1,39 @@
+@import "/src/difinitions";
+
+.cellWrapper {
+  width: $cell-size;
+  height: $cell-size;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: $figure-size;
+    position: relative;
+  }
+}
+
+.black {
+  background-color: $black-cell-color;
+}
+
+.white {
+  background-color: $white-cell-color;
+}
+
+.selected {
+  background-color: $selected-cell-color;
+}
+
+.crush {
+  background-color: $crush-color;
+}
+
+.available {
+  width: $dot-size;
+  height: $dot-size;
+  border-radius: 50%;
+
+  background-color: $available-dot-color;
+}

@@ -1,0 +1,11 @@
+@import "/src/difinitions";
+
+.boardWrapper {
+  //border: white solid 1px;
+
+  width: $cell-size * 8;
+  height: $cell-size * 8;
+
+  display: flex;
+  flex-wrap: wrap;
+}
