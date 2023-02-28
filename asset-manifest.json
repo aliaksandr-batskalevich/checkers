@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/checkers/static/css/main.669bb3b2.css",
-    "main.js": "/checkers/static/js/main.691b7d35.js",
+    "main.js": "/checkers/static/js/main.d66f0009.js",
     "static/js/787.96d4a48f.chunk.js": "/checkers/static/js/787.96d4a48f.chunk.js",
     "static/media/border-background.jpg": "/checkers/static/media/border-background.5c8c6b7a68b38443a7e1.jpg",
     "static/media/black-king.png": "/checkers/static/media/black-king.62b489e46233e3bdea45.png",
@@ -10,11 +10,11 @@
     "static/media/black-man.png": "/checkers/static/media/black-man.08b7393c2e10c43f597c.png",
     "index.html": "/checkers/index.html",
     "main.669bb3b2.css.map": "/checkers/static/css/main.669bb3b2.css.map",
-    "main.691b7d35.js.map": "/checkers/static/js/main.691b7d35.js.map",
+    "main.d66f0009.js.map": "/checkers/static/js/main.d66f0009.js.map",
     "787.96d4a48f.chunk.js.map": "/checkers/static/js/787.96d4a48f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.669bb3b2.css",
-    "static/js/main.691b7d35.js"
+    "static/js/main.d66f0009.js"
   ]
 }
