@@ -51,7 +51,7 @@ export const BoardComponent: FC<BoardPropsType> = ({board, setBoard}) => {
         getCellDanger();
     }, [selectedCell]);
 
-    const boardToRender = board.cells.map(row =>
+    const cellsToRender = board.cells.map(row =>
         <React.Fragment key={v1()}>
             {row.map(cell => <CellComponent
                 key={cell.id}
@@ -79,7 +79,7 @@ export const BoardComponent: FC<BoardPropsType> = ({board, setBoard}) => {
             <div className={s.mainRowWrapper}>
                 <div className={s.numbersWrapper}>{numbersToRender}</div>
                 <div className={s.cellsWrapper}>
-                    {boardToRender}
+                    {cellsToRender}
                 </div>
                 <div className={s.numbersWrapper}>{numbersToRender}</div>
             </div>

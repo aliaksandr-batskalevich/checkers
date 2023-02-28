@@ -43,7 +43,7 @@ export class Board {
             const row = this.cells[i];
             for (let j = 0; j < row.length; j++) {
                 const target = row[j];
-                target.isAvailable = !!selectedCell?.figure?.canMove(target);
+                target.isAvailable = !!selectedCell?.figure?.canMove(target, this);
             }
         }
     }

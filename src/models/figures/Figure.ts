@@ -3,6 +3,7 @@ import whiteManLogo from '../../assets/images/white-man.png';
 import {Cell} from "../Cell";
 import {v1} from "uuid";
 import {Board} from "../Board";
+import {getTransitCoordinates} from "../../utilites/functions";
 
 export enum FiguresNames {
     FIGURE = 'figure',
@@ -27,23 +28,16 @@ export class Figure {
         this.name = FiguresNames.FIGURE;
     }
 
-    canMove(target: Cell): boolean {
+    canMove(target: Cell, board: Board): boolean {
         return false;
     }
 
     moveFigure(target: Cell, board: Board) {
 
         // crush Figure
-        const transitCells: Array<Array<number>> = [];
-        const courseX = target.x - this.cell.x > 0 ? 1 : -1;
-        const courseY = target.y - this.cell.y > 0 ? 1 : -1;
-        for (let x = this.cell.x + courseX, y = this.cell.y + courseY;
-             x !== target.x && y !== target.y;
-             x = x + courseX, y = y + courseY) {
-            transitCells.push([x, y]);
-        }
+        const transitCoordinates = getTransitCoordinates(target, this);
 
-        transitCells
+        transitCoordinates
             .map(coordinate => {
             let [x, y] = coordinate;
             return board.getCell(x, y);
