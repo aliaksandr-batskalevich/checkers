@@ -13,8 +13,8 @@ export class Cell {
     figure: Figure | null;
 
     isAvailable: boolean;
-    isDanger: boolean
-    isForward: boolean
+    isDanger: boolean;
+    isForward: boolean;
 
     constructor(board: Board, x: number, y: number, color: Colors, figure: Figure | null) {
         this.id = v1();

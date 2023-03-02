@@ -1,10 +1,10 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import s from './BoardComponent.module.scss';
 import {v1} from "uuid";
 import {CellComponent} from "./Cell/CellComponent";
 import {Cell} from "../../models/Cell";
 import {useDispatch, useSelector} from "react-redux";
-import {getBoard, getCount, getOrder, getSelectedCell, getStatus} from "../../bll/selectors";
+import {getBoard, getCount, getForwards, getOrder, getSelectedCell, getStatus} from "../../bll/selectors";
 import {setBoard} from "../../bll/boardReducer";
 import {Colors} from "../../models/Colors";
 import {setCount, setOrder, setSelectedCell, setStatus, Status} from "../../bll/appReducer";
@@ -19,6 +19,7 @@ export const BoardComponent = () => {
     const order = useSelector(getOrder);
     const status = useSelector(getStatus);
     const selectedCell = useSelector(getSelectedCell);
+    const forwards = useSelector(getForwards);
 
     const updateBoard = () => {
         let updatedBoard = board.getCopyBoard();
@@ -35,9 +36,9 @@ export const BoardComponent = () => {
             dispatch(setStatus(Status.WAIT));
             pass();
         }
-
         dispatch(setBoard(updatedBoard));
     };
+
 
     const pass = () => {
         let newOrder = order === Colors.BLACK ? Colors.WHITE : Colors.BLACK;
@@ -45,21 +46,17 @@ export const BoardComponent = () => {
         setSelectedCellHandler(null);
     };
 
-    let setSelectedCellHandler = (selectedCell: null | Cell) => {
+    const setSelectedCellHandler = (selectedCell: null | Cell) => {
         dispatch(setSelectedCell(selectedCell));
     };
 
     const cellOnClickHandler = (cell: Cell) => {
 
         // select figures
-        if (status === Status.WAIT) {
-            // select blackFigure
-            if (order === Colors.BLACK && cell.figure?.color === Colors.BLACK) {
-                setSelectedCellHandler(cell);
-            }
-
-            // select whiteFigure
-            if (order === Colors.WHITE && cell.figure?.color === Colors.WHITE) {
+        if (status === Status.WAIT && cell.figure?.color === order) {
+            if (forwards.length) {
+                forwards.includes(cell) && setSelectedCellHandler(cell);
+            } else {
                 setSelectedCellHandler(cell);
             }
         }
@@ -84,16 +81,20 @@ export const BoardComponent = () => {
 
     const getCellForward = () => {
         board.getCellForward(order);
-    }
+    };
 
     useEffect(() => {
         getCellAvailable();
         getCellDanger();
-        getCellForward();
         updateBoard();
     }, [selectedCell]);
 
-    const cellsToRender = board._cells.map(row =>
+    useEffect(() => {
+        getCellForward();
+        updateBoard();
+    }, [order]);
+
+    const cellsToRender = board.cells.map(row =>
         <React.Fragment key={v1()}>
             {row.map(cell => <CellComponent
                 key={cell.id}

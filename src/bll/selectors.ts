@@ -3,6 +3,7 @@ import {Status} from "./appReducer";
 import {Board} from "../models/Board";
 import {Cell} from "../models/Cell";
 import {Colors} from "../models/Colors";
+import {createSelector} from "reselect";
 
 // app
 export const getIsAppInit = (state: RootStateType): boolean => state.app.isAppInit;
@@ -14,3 +15,4 @@ export const getSelectedCell = (state: RootStateType): null | Cell =>state.app.s
 
 // board
 export const getBoard = (state: RootStateType): Board => state.board.board;
+export const getForwards = createSelector(getBoard, (board: Board): Array<Cell> => board.cells.flat().filter(cell => cell.isForward));
