@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import s from './BoardComponent.module.scss';
 import {v1} from "uuid";
 import {CellComponent} from "./Cell/CellComponent";
@@ -30,24 +30,24 @@ export const BoardComponent = () => {
                 dispatch(setStatus(Status.CRUSH));
             } else {
                 dispatch(setStatus(Status.WAIT));
-                pass();
+                changeOrder();
             }
         } else if (status === Status.MOVE) {
             dispatch(setStatus(Status.WAIT));
-            pass();
+            changeOrder();
         }
         dispatch(setBoard(updatedBoard));
     };
 
 
-    const pass = () => {
+    const changeOrder = () => {
         let newOrder = order === Colors.BLACK ? Colors.WHITE : Colors.BLACK;
         dispatch(setOrder(newOrder));
         setSelectedCellHandler(null);
     };
 
-    const setSelectedCellHandler = (selectedCell: null | Cell) => {
-        dispatch(setSelectedCell(selectedCell));
+    const setSelectedCellHandler = (cell: null | Cell) => {
+        dispatch(setSelectedCell(cell));
     };
 
     const cellOnClickHandler = (cell: Cell) => {
@@ -70,6 +70,9 @@ export const BoardComponent = () => {
 
     };
 
+    const getCellForward = () => {
+        board.getCellForward(order);
+    };
 
     const getCellAvailable = () => {
         board.getCellAvailable(selectedCell);
@@ -77,10 +80,6 @@ export const BoardComponent = () => {
 
     const getCellDanger = () => {
         board.getCellDanger(selectedCell);
-    };
-
-    const getCellForward = () => {
-        board.getCellForward(order);
     };
 
     useEffect(() => {
