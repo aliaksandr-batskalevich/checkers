@@ -84,7 +84,6 @@ export const BoardComponent = () => {
 
     useEffect(() => {
         getCellAvailable();
-        getCellDanger();
         updateBoard();
     }, [selectedCell]);
 

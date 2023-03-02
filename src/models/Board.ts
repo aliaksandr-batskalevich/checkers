@@ -1,6 +1,7 @@
 import {Cell} from "./Cell";
 import {Colors} from "./Colors";
 import {Man} from "./figures/Man";
+import {getTransitCoordinates} from "../utilites/functions";
 
 export class Board {
     _cells: Array<Array<Cell>> = [];
@@ -58,15 +59,26 @@ export class Board {
         const allCells = this.getAllCells();
         const forwards = allCells.filter(cell => cell.isForward);
 
-        if (forwards.length) {
+        this.getCellDanger(selectedCell);
 
+        if (forwards.length && selectedCell) {
+            allCells.forEach(cell => {
+                let isAvailable = !!selectedCell?.figure?.canMove(cell, this);
+                if (isAvailable) {
+                    const transitCells = getTransitCoordinates(selectedCell, cell).map(coordinate => {
+                        const [x, y] = coordinate;
+                        return this.getCell(x, y);
+                    });
+                    cell.isAvailable = transitCells.some(c => c.isDanger);
+                } else {
+                    cell.isAvailable = false;
+                }
+            });
         } else {
-
+            allCells.forEach(cell => {
+                cell.isAvailable = !!selectedCell?.figure?.canMove(cell, this);
+            });
         }
-
-        allCells.forEach(cell => {
-            cell.isAvailable = !!selectedCell?.figure?.canMove(cell, this);
-        })
 
     }
 
