@@ -11,12 +11,6 @@ import {getCount, getIsWinner, getOrder} from "./bll/selectors";
 
 function App() {
 
-    // warningMessage
-    useEffect(() => {
-        alert('готово правило "Бей обязательно!", сломал multiCrush, исправляю :)');
-    }, []);
-
-
     const isWinner = useSelector(getIsWinner);
     const order = useSelector(getOrder);
     const count = useSelector(getCount);
