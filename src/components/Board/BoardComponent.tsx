@@ -25,18 +25,23 @@ export const BoardComponent = () => {
         let updatedBoard = board.getCopyBoard();
         let updatedCount = updatedBoard.getCount();
         if (count[0] + count[1] !== updatedCount[0] + updatedCount[1]) {
-            dispatch(setCount(updatedCount));
+
             if (selectedCell?.isForward) {
                 dispatch(setStatus(Status.CRUSH));
             } else {
                 dispatch(setStatus(Status.WAIT));
                 changeOrder();
             }
+
+            dispatch(setCount(updatedCount));
+
         } else if (status === Status.MOVE) {
             dispatch(setStatus(Status.WAIT));
             changeOrder();
         }
+
         dispatch(setBoard(updatedBoard));
+
     };
 
 
@@ -62,35 +67,21 @@ export const BoardComponent = () => {
         }
 
         // move to target cell
-        if (cell.isAvailable) {
-            selectedCell?.moveFigure(cell);
-            setSelectedCellHandler(cell);
+        if (cell.isAvailable && selectedCell) {
+            selectedCell.moveFigure(cell);
             dispatch(setStatus(Status.MOVE));
+            setSelectedCellHandler(cell);
         }
 
     };
 
-    const getCellForward = () => {
-        board.getCellForward(order);
-    };
-
-    const getCellAvailable = () => {
-        board.getCellAvailable(selectedCell);
-    };
-
-    const getCellDanger = () => {
-        board.getCellDanger(selectedCell);
-    };
 
     useEffect(() => {
-        getCellAvailable();
+        board.getCellAvailable(selectedCell);
+        board.getCellForward(order);
         updateBoard();
     }, [selectedCell]);
 
-    useEffect(() => {
-        getCellForward();
-        updateBoard();
-    }, [order]);
 
     const cellsToRender = board._cells.map(row =>
         <React.Fragment key={v1()}>
