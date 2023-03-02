@@ -4,7 +4,7 @@ import {Cell} from "../Cell";
 import whiteManLogo from '../../assets/images/white-man.png';
 import blackManLogo from '../../assets/images/black-man.png';
 import {Board} from "../Board";
-import {getCanCrushColorCondition, getNextCellAfterCrushedFigure, getTransitCoordinates} from "../../utilites/functions";
+import {getNextCellAfterCrushedFigure, getTransitCoordinates} from "../../utilites/functions";
 
 
 export class Man extends Figure {
@@ -46,7 +46,7 @@ export class Man extends Figure {
     }
 
     canCrush(target: Cell, board: Board): boolean {
-        const colorCondition = getCanCrushColorCondition(target, this.color);
+        const colorCondition = !!target.figure && target.figure.color !== this.color;
         const nextCell = getNextCellAfterCrushedFigure(target, this.cell);
         if (!nextCell) return false;
 

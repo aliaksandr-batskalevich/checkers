@@ -6,6 +6,7 @@ import {Colors} from "../models/Colors";
 
 // app
 export const getIsAppInit = (state: RootStateType): boolean => state.app.isAppInit;
+export const getIsWinner = (state: RootStateType): null | Colors => state.app.isWinner;
 export const getCount = (state: RootStateType): Array<number> => state.app.count;
 export const getOrder = (state: RootStateType): Colors => state.app.order;
 export const getStatus = (state: RootStateType): Status => state.app.status;

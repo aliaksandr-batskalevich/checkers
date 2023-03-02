@@ -5,7 +5,6 @@ import whiteKingLogo from '../../assets/images/white-king.png';
 import blackKingLogo from '../../assets/images/black-king.png';
 import {Board} from "../Board";
 import {
-    getCanCrushColorCondition,
     getNextCellAfterCrushedFigure,
     getTransitCoordinates,
     testKingTransitCell

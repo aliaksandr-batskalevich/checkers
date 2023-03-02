@@ -2,6 +2,7 @@ import {Cell} from "../models/Cell";
 import {Colors} from "../models/Colors";
 
 export type AppActionsType = ReturnType<typeof setInitApp>
+    | ReturnType<typeof setIsWinner>
     | ReturnType<typeof setCount>
     | ReturnType<typeof setOrder>
     | ReturnType<typeof setStatus>
@@ -14,6 +15,7 @@ export enum Status {
 }
 
 type AppStateType = {
+    isWinner: null | Colors
     isAppInit: boolean
     count: Array<number>
     order: Colors
@@ -22,6 +24,7 @@ type AppStateType = {
 };
 
 const appInitState: AppStateType = {
+    isWinner: null,
     isAppInit: false,
     count: [12, 12],
     order: Colors.BLACK,
@@ -33,12 +36,13 @@ export const appReducer = (state: AppStateType = appInitState, action: AppAction
     switch (action.type) {
         case 'INIT_APP':
             return {...state, isAppInit: true};
+        case 'SET_IS_WINNER':
+            return {...state, ...action.payload};
         case 'SET_COUNT':
             return {...state, ...action.payload};
         case 'SET_ORDER':
             return {...state, ...action.payload};
         case 'SET_STATUS':
-            // debugger;
             return {...state, ...action.payload};
         case 'SET_SELECTED_CELL':
             return {...state, ...action.payload};
@@ -78,5 +82,12 @@ export const setSelectedCell = (selectedCell: null | Cell) => {
     return {
         type: 'SET_SELECTED_CELL',
         payload: {selectedCell}
+    } as const;
+};
+
+export const setIsWinner = (isWinner: Colors | null) => {
+    return {
+        type: 'SET_IS_WINNER',
+        payload: {isWinner}
     } as const;
 };

@@ -13,15 +13,6 @@ export const getTransitCoordinates = (target: Cell, thisCell: Cell): Array<Array
     return transitCells;
 };
 
-export const getCanCrushColorCondition = (target: Cell, thisColor: Colors): boolean => {
-    const conditionWhite = target.figure?.color === Colors.BLACK;
-    const conditionBlack = target.figure?.color === Colors.WHITE;
-
-    return thisColor === Colors.WHITE
-        ? conditionWhite
-        : conditionBlack;
-};
-
 export const getNextCellAfterCrushedFigure = (target: Cell, thisCell: Cell): Array<number> | false => {
     const courseY = target.y - thisCell.y > 0 ? 1 : -1;
     const courseX = target.x - thisCell.x > 0 ? 1 : -1;
