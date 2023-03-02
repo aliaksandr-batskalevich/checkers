@@ -15,4 +15,4 @@ export const getSelectedCell = (state: RootStateType): null | Cell =>state.app.s
 
 // board
 export const getBoard = (state: RootStateType): Board => state.board.board;
-export const getForwards = createSelector(getBoard, (board: Board): Array<Cell> => board.cells.flat().filter(cell => cell.isForward));
+export const getForwards = createSelector(getBoard, (board: Board): Array<Cell> => board.getAllCells().filter(cell => cell.isForward));

@@ -93,7 +93,7 @@ export const BoardComponent = () => {
         updateBoard();
     }, [order]);
 
-    const cellsToRender = board.cells.map(row =>
+    const cellsToRender = board._cells.map(row =>
         <React.Fragment key={v1()}>
             {row.map(cell => <CellComponent
                 key={cell.id}

@@ -3,7 +3,7 @@ import {Colors} from "./Colors";
 import {Man} from "./figures/Man";
 
 export class Board {
-    cells: Array<Array<Cell>> = [];
+    _cells: Array<Array<Cell>> = [];
 
     public initCells() {
         for (let y = 0; y < 8; y++) {
@@ -15,23 +15,27 @@ export class Board {
                     : row.push(new Cell(this, x, y, Colors.WHITE, null));
             }
 
-            this.cells.push(row);
+            this._cells.push(row);
         }
     }
 
     public getCell(x: number, y: number): Cell {
-        return this.cells[y][x];
+        return this._cells[y][x];
+    }
+
+    public getAllCells() {
+        return this._cells.flat();
     }
 
     public getCount(): Array<number> {
         let whiteCount = 0;
         let blackCount = 0;
-        this.cells.forEach(raw => {
-            raw.forEach(cell => {
+        this.getAllCells()
+            .forEach((cell) => {
                 cell.figure?.color === Colors.WHITE && whiteCount++;
                 cell.figure?.color === Colors.BLACK && blackCount++;
             })
-        })
+
         return [whiteCount, blackCount];
     }
 
@@ -46,12 +50,12 @@ export class Board {
 
     public getCopyBoard(): Board {
         const newBoard = new Board();
-        newBoard.cells = this.cells;
+        newBoard._cells = this._cells;
         return newBoard;
     }
 
     public getCellAvailable(selectedCell: Cell | null) {
-        const allCells = this.cells.flat();
+        const allCells = this.getAllCells();
         const forwards = allCells.filter(cell => cell.isForward);
 
         if (forwards.length) {
@@ -64,36 +68,25 @@ export class Board {
             cell.isAvailable = !!selectedCell?.figure?.canMove(cell, this);
         })
 
-        // for (let i = 0; i < this._cells.length; i++) {
-        //     const row = this._cells[i];
-        //     for (let j = 0; j < row.length; j++) {
-        //         const target = row[j];
-        //         target.isAvailable = !!selectedCell?.figure?.canMove(target, this);
-        //     }
-        // }
     }
 
     public getCellDanger(selectedCell: Cell | null) {
-        for (let i = 0; i < this.cells.length; i++) {
-            const row = this.cells[i];
-            for (let j = 0; j < row.length; j++) {
-                const target = row[j];
-                target.isDanger = !!selectedCell?.figure?.canCrush(target, this);
-            }
-        }
+        this.getAllCells()
+            .forEach(cell => {
+                cell.isDanger = !!selectedCell?.figure?.canCrush(cell, this);
+            });
     }
 
     public getCellForward(order: Colors) {
-        const allCells = this.cells.flat();
-        allCells.forEach((cell, i, arr) => {
-            if (cell.figure?.color === order) {
-                const isForward = arr.some(c => cell.figure?.canCrush(c, this));
-                cell.isForward = isForward;
-            } else {
-                cell.isForward = false;
-            }
-        })
-
+        this.getAllCells()
+            .forEach((cell, i, arr) => {
+                if (cell.figure?.color === order) {
+                    const isForward = arr.some(c => cell.figure?.canCrush(c, this));
+                    cell.isForward = isForward;
+                } else {
+                    cell.isForward = false;
+                }
+            });
     }
 
 }
