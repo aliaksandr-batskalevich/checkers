@@ -4,7 +4,12 @@ import {Cell} from "../Cell";
 import whiteKingLogo from '../../assets/images/white-king.png';
 import blackKingLogo from '../../assets/images/black-king.png';
 import {Board} from "../Board";
-import {getCanCrushColoCondition, getNextCellAfterCrushedFigure, getTransitCoordinates} from "../../utilites/functions";
+import {
+    getCanCrushColorCondition,
+    getNextCellAfterCrushedFigure,
+    getTransitCoordinates,
+    testKingTransitCell
+} from "../../utilites/functions";
 
 export class King extends Figure {
 
@@ -16,33 +21,35 @@ export class King extends Figure {
     }
 
     canMove(target: Cell, board: Board): boolean {
-        const preCondition = target.color === Colors.BLACK && !target.figure
+        const preCondition = target.color === Colors.BLACK
+            && !target.figure
             // diagonal
             && Math.abs(target.y - this.cell.y) === Math.abs(target.x - this.cell.x);
 
         if (!preCondition) return false;
 
         // no double figures on course & mineFigure
-        const transitCoordinates = getTransitCoordinates(target, this);
+        const transitCoordinates = getTransitCoordinates(target, this.cell);
         const transitCells = transitCoordinates.map(coordinate => {
             const [x, y] = coordinate;
             return board.getCell(x, y);
         });
-        const transitCondition = transitCells.reduce((acc, cell, i, arr) => acc && !((arr[i + 1] && cell.figure && arr[i + 1].figure) || cell.figure?.color === this.color), true);
+        const transitCondition = testKingTransitCell(transitCells, this.color);
 
         return transitCondition;
     }
 
     canCrush(target: Cell, board: Board): boolean {
-        const isCourseCondition = Math.abs(this.cell.x - target.x) === Math.abs(this.cell.y - target.y);
-        const colorCondition = getCanCrushColoCondition(target, this);
-        const nextCellCoordinates = getNextCellAfterCrushedFigure(target, this);
-        if (!(isCourseCondition && nextCellCoordinates && colorCondition)) return false;
+        const isCourseCondition = Math.abs(target.x - this.cell.x) === Math.abs(target.y - this.cell.y);
+        const colorFigureCondition = !!target.figure && target.figure.color !== this.color;
+        const nextCellCoordinates = getNextCellAfterCrushedFigure(target, this.cell);
 
-        const [nextCellX, nextCellY] = nextCellCoordinates;
-        const nextTargetCell = board.getCell(nextCellX, nextCellY);
-        const freeNextCellCondition = !nextTargetCell.figure;
+        if (isCourseCondition && nextCellCoordinates && colorFigureCondition) {
+            const [nextCellX, nextCellY] = nextCellCoordinates;
+            const nextTargetCell = board.getCell(nextCellX, nextCellY);
+            const freeNextCellCondition = !nextTargetCell.figure;
+            return freeNextCellCondition && this.canMove(nextTargetCell, board);
 
-        return freeNextCellCondition && nextTargetCell.isAvailable;
+        } else return false;
     }
 }

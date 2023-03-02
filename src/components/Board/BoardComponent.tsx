@@ -1,57 +1,99 @@
-import React, {FC, useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import s from './BoardComponent.module.scss';
-import {Board} from "../../models/Board";
 import {v1} from "uuid";
 import {CellComponent} from "./Cell/CellComponent";
 import {Cell} from "../../models/Cell";
+import {useDispatch, useSelector} from "react-redux";
+import {getBoard, getCount, getOrder, getSelectedCell, getStatus} from "../../bll/selectors";
+import {setBoard} from "../../bll/boardReducer";
 import {Colors} from "../../models/Colors";
+import {setCount, setOrder, setSelectedCell, setStatus, Status} from "../../bll/appReducer";
 
-interface BoardPropsType {
-    board: Board
-    setBoard: (board: Board) => void
-}
 
-export const BoardComponent: FC<BoardPropsType> = ({board, setBoard}) => {
+export const BoardComponent = () => {
+
+    const dispatch = useDispatch();
+
+    const count = useSelector(getCount);
+    const board = useSelector(getBoard);
+    const order = useSelector(getOrder);
+    const status = useSelector(getStatus);
+    const selectedCell = useSelector(getSelectedCell);
 
     const updateBoard = () => {
         let updatedBoard = board.getCopyBoard();
-        setBoard(updatedBoard);
-    }
+        let updatedCount = updatedBoard.getCount();
+        if (count[0] + count[1] !== updatedCount[0] + updatedCount[1]) {
+            dispatch(setCount(updatedCount));
+            if (selectedCell?.isForward) {
+                dispatch(setStatus(Status.CRUSH));
+            } else {
+                dispatch(setStatus(Status.WAIT));
+                pass();
+            }
+        } else if (status === Status.MOVE) {
+            dispatch(setStatus(Status.WAIT));
+            pass();
+        }
 
-    const [selectedCell, setSelectedCell] = useState<null | Cell>(null);
+        dispatch(setBoard(updatedBoard));
+    };
 
+    const pass = () => {
+        let newOrder = order === Colors.BLACK ? Colors.WHITE : Colors.BLACK;
+        dispatch(setOrder(newOrder));
+        setSelectedCellHandler(null);
+    };
+
+    let setSelectedCellHandler = (selectedCell: null | Cell) => {
+        dispatch(setSelectedCell(selectedCell));
+    };
 
     const cellOnClickHandler = (cell: Cell) => {
-        // select figure
-        // if (cell.figure?.color === Colors.BLACK) {
-        //     setSelectedCell(cell);
-        // }
-        cell.figure && setSelectedCell(cell);
 
+        // select figures
+        if (status === Status.WAIT) {
+            // select blackFigure
+            if (order === Colors.BLACK && cell.figure?.color === Colors.BLACK) {
+                setSelectedCellHandler(cell);
+            }
+
+            // select whiteFigure
+            if (order === Colors.WHITE && cell.figure?.color === Colors.WHITE) {
+                setSelectedCellHandler(cell);
+            }
+        }
 
         // move to target cell
         if (cell.isAvailable) {
-            let figure = selectedCell?.figure;
             selectedCell?.moveFigure(cell);
-            setSelectedCell(null);
+            setSelectedCellHandler(cell);
+            dispatch(setStatus(Status.MOVE));
         }
+
     };
+
+
     const getCellAvailable = () => {
         board.getCellAvailable(selectedCell);
-        updateBoard();
     };
 
     const getCellDanger = () => {
         board.getCellDanger(selectedCell);
-        updateBoard();
+    };
+
+    const getCellForward = () => {
+        board.getCellForward(order);
     }
 
     useEffect(() => {
         getCellAvailable();
         getCellDanger();
+        getCellForward();
+        updateBoard();
     }, [selectedCell]);
 
-    const cellsToRender = board.cells.map(row =>
+    const cellsToRender = board._cells.map(row =>
         <React.Fragment key={v1()}>
             {row.map(cell => <CellComponent
                 key={cell.id}
@@ -66,7 +108,7 @@ export const BoardComponent: FC<BoardPropsType> = ({board, setBoard}) => {
     // const lettersArr = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', ''];
     // const numbersArr = [1, 2, 3, 4, 5, 6, 7, 8];
 
-    // arrays for development
+    // markUpArrays for development
     const lettersArr = ['', '0', '1', '2', '3', '4', '5', '6', '7', ''];
     const numbersArr = [7, 6, 5, 4, 3, 2, 1, 0];
 

@@ -25,7 +25,14 @@ export const CellComponent: FC<CellComponentPropsType> = ({cell, isSelected, cel
                 : s.black;
 
     const selectedClassName = isSelected ? s.selected : '';
-    const rootClassName = `${s.cellWrapper} ${colorClassName} ${selectedClassName}`;
+    const forwardClassName = cell.isForward ? s.forward : '';
+
+    const rootClassName = [
+        s.cellWrapper,
+        colorClassName,
+        forwardClassName,
+        selectedClassName,
+    ].join(' ');
 
     const isAvailable = !cell.figure && cell.isAvailable;
 

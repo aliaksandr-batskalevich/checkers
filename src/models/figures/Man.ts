@@ -4,7 +4,7 @@ import {Cell} from "../Cell";
 import whiteManLogo from '../../assets/images/white-man.png';
 import blackManLogo from '../../assets/images/black-man.png';
 import {Board} from "../Board";
-import {getCanCrushColoCondition, getNextCellAfterCrushedFigure} from "../../utilites/functions";
+import {getCanCrushColorCondition, getNextCellAfterCrushedFigure, getTransitCoordinates} from "../../utilites/functions";
 
 
 export class Man extends Figure {
@@ -16,26 +16,38 @@ export class Man extends Figure {
         this.logo = color === Colors.WHITE ? whiteManLogo : blackManLogo;
     }
 
-    canMove(target: Cell): boolean {
+    canMove(target: Cell, board: Board): boolean {
+        if (target.color === Colors.WHITE) return false;
 
-        const conditionWhite = target.y === this.cell.y + 1;
-        const conditionBlack = target.y === this.cell.y - 1;
+        const conditionCourseOneWhite = target.y === this.cell.y + 1;
+        const conditionCourseOneBlack = target.y === this.cell.y - 1;
+        const courseOneCondition = this.color === Colors.WHITE
+            ? conditionCourseOneWhite
+            : conditionCourseOneBlack;
+        const conditionFrontFree = Math.abs(target.x - this.cell.x) === 1
+            && courseOneCondition
+            && !target.figure;
 
-        const colorCondition = this.color === Colors.WHITE
-            ? conditionWhite
-            : conditionBlack;
+        if (conditionFrontFree) return true;
 
-        const condition = target.color === Colors.BLACK
-            && !target.figure
-            && colorCondition
-            && Math.abs(target.x - this.cell.x) === 1;
+        // can move after crush
+        const isOnCourseTwoSteps = Math.abs(target.x - this.cell.x) === Math.abs(target.y - this.cell.y)
+            && Math.abs(target.x - this.cell.x) === 2;
+        if (!isOnCourseTwoSteps) return false;
 
-        return condition;
+        const transitCoordinates = getTransitCoordinates(target, this.cell);
+        const [x, y] = transitCoordinates[0];
+        const cell = board.getCell(x, y);
+
+        const conditionMoveAfterCrush = cell.figure && cell.figure.color !== this.color;
+
+        return !!conditionMoveAfterCrush;
+
     }
 
     canCrush(target: Cell, board: Board): boolean {
-        const colorCondition = getCanCrushColoCondition(target, this);
-        const nextCell = getNextCellAfterCrushedFigure(target, this);
+        const colorCondition = getCanCrushColorCondition(target, this.color);
+        const nextCell = getNextCellAfterCrushedFigure(target, this.cell);
         if (!nextCell) return false;
 
         const [nextCellX, nextCellY] = nextCell;
@@ -47,10 +59,7 @@ export class Man extends Figure {
             && Math.abs(target.y - this.cell.y) === 1
             && freeNextCellCondition;
 
-        if (condition) nextTargetCell.isAvailable = true;
-
         return condition;
     }
-
 
 }

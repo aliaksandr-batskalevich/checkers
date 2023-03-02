@@ -35,7 +35,7 @@ export class Figure {
     moveFigure(target: Cell, board: Board) {
 
         // crush Figure
-        const transitCoordinates = getTransitCoordinates(target, this);
+        const transitCoordinates = getTransitCoordinates(target, this.cell);
 
         transitCoordinates
             .map(coordinate => {

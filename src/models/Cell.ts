@@ -14,6 +14,7 @@ export class Cell {
 
     isAvailable: boolean;
     isDanger: boolean
+    isForward: boolean
 
     constructor(board: Board, x: number, y: number, color: Colors, figure: Figure | null) {
         this.id = v1();
@@ -25,6 +26,7 @@ export class Cell {
 
         this.isAvailable = false;
         this.isDanger = false;
+        this.isForward = false;
     };
 
     moveFigure(target: Cell) {
@@ -42,7 +44,7 @@ export class Cell {
     }
 
     transformFigure() {
-        if (this.figure?.color) {
+        if (this.figure) {
             let newFigure = new King(this.figure.color, this);
             this.figure = newFigure;
         }
