@@ -1,7 +1,7 @@
 import {Cell} from "./Cell";
 import {Colors} from "./Colors";
 import {Man} from "./figures/Man";
-import {getRandomFromTo, getTransitCoordinates} from "../utilites/functions";
+import {getTransitCoordinates, randomIndexMaker} from "../utilites/functions";
 import {Level} from "../bll/appReducer";
 
 
@@ -107,47 +107,27 @@ export class Board {
             });
     }
 
-    public getCellAutoMove(order: Colors, level: Level): Array<Cell> {
+    public getCellAutoMove(color: Colors, level: Level): Array<Cell> {
         let selectedCell = null as null | Cell;
         let targetCell = null as null | Cell;
 
         const allCells = this.getAllCells();
-        const myCellsFigure = allCells.filter(cell => cell.figure?.color === order);
+        const myCellsFigure = allCells.filter(cell => cell.figure?.color === color);
+        const freeCell = allCells.filter(cell => !cell.figure);
         const myCellsForward = myCellsFigure.filter(cell => cell.isForward);
 
-        console.log('myCellsForward.length', myCellsForward.length);
-
         if (myCellsForward.length) {
-            const randomIndex = myCellsForward.length > 1
-                ? getRandomFromTo(0, myCellsForward.length - 1)
-                : 0;
-            selectedCell = myCellsForward[randomIndex];
-            console.log('randomIndex', randomIndex);
-
-            this.getCellAvailable(selectedCell);
-            const availableCells = this.getAllCells().filter(cell => cell.isAvailable);
-            console.log('available.length', availableCells.length)
-
-            targetCell = availableCells.length > 1
-                ? availableCells[getRandomFromTo(0, availableCells.length - 1)]
-                : availableCells[0];
-
+            selectedCell = myCellsForward[randomIndexMaker(myCellsForward.length - 1)];
         } else {
-            const myCellsFigureCanMove = myCellsFigure.filter(cell => allCells.some(target => cell.figure?.canMove(target)));
-            const index = myCellsFigureCanMove.length > 1
-                ? getRandomFromTo(0, myCellsFigureCanMove.length - 1)
-                : 0;
-            selectedCell = myCellsFigureCanMove[index];
-
-            this.getCellAvailable(selectedCell);
-            const availableCells = allCells.filter(cell => cell.isAvailable);
-
-            targetCell = availableCells.length > 1
-                ? availableCells[getRandomFromTo(0, availableCells.length - 1)]
-                : availableCells[0];
+            const myCellsFigureCanMove = myCellsFigure.filter(myCellFigure => freeCell.some(target => myCellFigure.figure?.canMove(target)));
+            selectedCell = myCellsFigureCanMove[randomIndexMaker(myCellsFigureCanMove.length - 1)];
         }
-        // alert(`${selectedCell?.x} ${selectedCell?.y}`);
-        // alert(`${targetCell?.x} ${targetCell?.y}`);
+        this.getCellAvailable(selectedCell);
+        const availableCells = allCells.filter(cell => cell.isAvailable);
+
+        targetCell = availableCells[randomIndexMaker(availableCells.length - 1)];
+
+        // alert(`${selectedCell?.x} ${selectedCell?.y} - ${targetCell?.x} ${targetCell?.y} ${myCellsForward.length > 0}`);
 
         if (selectedCell && targetCell) {
             return [selectedCell, targetCell];

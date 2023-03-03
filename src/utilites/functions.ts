@@ -35,3 +35,4 @@ export const testKingTransitCell = (transitCells: Array<Cell>, thisColor: Colors
 // to generate random number
 
 export const getRandomFromTo = (min: number, max: number) => Math.floor(min + Math.random() * (max - min + 1));
+export const randomIndexMaker = (length: number) => length > 1 ? getRandomFromTo(0 , length) : 0;

@@ -3,7 +3,6 @@ import {Colors} from "../Colors";
 import {Cell} from "../Cell";
 import whiteManLogo from '../../assets/images/white-man.png';
 import blackManLogo from '../../assets/images/black-man.png';
-import {Board} from "../Board";
 import {getNextCellAfterCrushedFigure, getTransitCoordinates} from "../../utilites/functions";
 
 
@@ -17,7 +16,9 @@ export class Man extends Figure {
     }
 
     canMove(target: Cell): boolean {
-        if (target.color === Colors.WHITE) return false;
+        const colorCondition = target.color === Colors.BLACK;
+        const noFigureCondition = !target.figure;
+        if (!colorCondition || !noFigureCondition) return false;
 
         const conditionCourseOneWhite = target.y === this.cell.y + 1;
         const conditionCourseOneBlack = target.y === this.cell.y - 1;

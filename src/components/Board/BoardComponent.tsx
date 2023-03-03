@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {getBoard, getCount, getForwards, getOrder, getSelectedCell, getStatus} from "../../bll/selectors";
 import {setBoard} from "../../bll/boardReducer";
 import {Colors} from "../../models/Colors";
-import {Level, setCount, setOrder, setSelectedCell, setStatus, Status} from "../../bll/appReducer";
+import {Level, setCount, setIsWinner, setOrder, setSelectedCell, setStatus, Status} from "../../bll/appReducer";
 
 
 export const BoardComponent = () => {
@@ -21,6 +21,23 @@ export const BoardComponent = () => {
     const board = useSelector(getBoard);
     const forwards = useSelector(getForwards);
 
+    const moveToTargetCell = (selectedCell: Cell, targetCell: Cell) => {
+        selectedCell.moveFigure(targetCell);
+        dispatch(setStatus(Status.MOVE));
+        setSelectedCellHandler(targetCell);
+    };
+
+    const autoMoveHandler = (color: Colors) => {
+        const [selectedCell, targetCell] = board.getCellAutoMove(order, Level.LOW);
+        if (selectedCell && targetCell) {
+            moveToTargetCell(selectedCell, targetCell);
+        } else {
+            dispatch(setIsWinner(color === Colors.WHITE
+                ? Colors.BLACK
+                : Colors.WHITE));
+        }
+    };
+
     const updateBoard = () => {
         let updatedBoard = board.getCopyBoard();
         let updatedCount = updatedBoard.getCount();
@@ -29,12 +46,7 @@ export const BoardComponent = () => {
             if (selectedCell?.isForward) {
                 dispatch(setStatus(Status.CRUSH));
                 if (order === Colors.WHITE) {
-                    const [selectedCell, targetCell] = board.getCellAutoMove(order, Level.LOW);
-                    if (selectedCell && targetCell) {
-                        selectedCell.moveFigure(targetCell);
-                        dispatch(setStatus(Status.MOVE));
-                        setSelectedCellHandler(targetCell);
-                    }
+                    autoMoveHandler(Colors.WHITE);
                 }
             } else {
                 dispatch(setStatus(Status.WAIT));
@@ -76,9 +88,7 @@ export const BoardComponent = () => {
 
         // move to target cell
         if (cell.isAvailable && selectedCell) {
-            selectedCell.moveFigure(cell);
-            dispatch(setStatus(Status.MOVE));
-            setSelectedCellHandler(cell);
+            moveToTargetCell(selectedCell, cell);
         }
 
     };
@@ -93,12 +103,7 @@ export const BoardComponent = () => {
 
     useEffect(() => {
         if (order === Colors.WHITE) {
-            const [selectedCell, targetCell] = board.getCellAutoMove(order, Level.LOW);
-            if (selectedCell && targetCell) {
-                selectedCell.moveFigure(targetCell);
-                dispatch(setStatus(Status.MOVE));
-                setSelectedCellHandler(targetCell);
-            }
+            autoMoveHandler(Colors.WHITE);
         }
     }, [order])
 

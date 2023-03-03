@@ -3,12 +3,7 @@ import {Colors} from "../Colors";
 import {Cell} from "../Cell";
 import whiteKingLogo from '../../assets/images/white-king.png';
 import blackKingLogo from '../../assets/images/black-king.png';
-import {Board} from "../Board";
-import {
-    getNextCellAfterCrushedFigure,
-    getTransitCoordinates,
-    testKingTransitCell
-} from "../../utilites/functions";
+import {getNextCellAfterCrushedFigure, getTransitCoordinates, testKingTransitCell} from "../../utilites/functions";
 
 export class King extends Figure {
 
@@ -20,12 +15,11 @@ export class King extends Figure {
     }
 
     canMove(target: Cell): boolean {
-        const preCondition = target.color === Colors.BLACK
-            && !target.figure
-            // diagonal
-            && Math.abs(target.y - this.cell.y) === Math.abs(target.x - this.cell.x);
+        const colorCondition = target.color === Colors.BLACK;
+        const noFigureCondition = !target.figure;
+        const diagonalCondition = Math.abs(target.y - this.cell.y) === Math.abs(target.x - this.cell.x);
 
-        if (!preCondition) return false;
+        if (!colorCondition || !noFigureCondition || !diagonalCondition) return false;
 
         // no double figures on course & mineFigure
         const transitCoordinates = getTransitCoordinates(target, this.cell);

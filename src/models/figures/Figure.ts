@@ -2,7 +2,6 @@ import {Colors} from "../Colors";
 import whiteManLogo from '../../assets/images/white-man.png';
 import {Cell} from "../Cell";
 import {v1} from "uuid";
-import {Board} from "../Board";
 import {getTransitCoordinates} from "../../utilites/functions";
 
 export enum FiguresNames {
