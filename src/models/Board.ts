@@ -1,7 +1,9 @@
 import {Cell} from "./Cell";
 import {Colors} from "./Colors";
 import {Man} from "./figures/Man";
-import {getTransitCoordinates} from "../utilites/functions";
+import {getRandomFromTo, getTransitCoordinates} from "../utilites/functions";
+import {Level} from "../bll/appReducer";
+
 
 export class Board {
     _cells: Array<Array<Cell>> = [];
@@ -63,29 +65,33 @@ export class Board {
 
         if (forwards.length && selectedCell) {
             allCells.forEach(cell => {
-                let isAvailable = !!selectedCell?.figure?.canMove(cell, this);
+
+                let isAvailable = !!selectedCell?.figure?.canMove(cell);
+
                 if (isAvailable) {
                     const transitCells = getTransitCoordinates(selectedCell, cell).map(coordinate => {
                         const [x, y] = coordinate;
                         return this.getCell(x, y);
                     });
-                    cell.isAvailable = transitCells.some(c => c.isDanger);
+                    cell.isAvailable = transitCells.some(transitCell => transitCell.isDanger);
                 } else {
                     cell.isAvailable = false;
                 }
+
             });
         } else {
-            allCells.forEach(cell => {
-                cell.isAvailable = !!selectedCell?.figure?.canMove(cell, this);
-            });
-        }
 
+            allCells.forEach(cell => {
+                cell.isAvailable = !!selectedCell?.figure?.canMove(cell);
+            });
+
+        }
     }
 
     public getCellDanger(selectedCell: Cell | null) {
         this.getAllCells()
             .forEach(cell => {
-                cell.isDanger = !!selectedCell?.figure?.canCrush(cell, this);
+                cell.isDanger = !!selectedCell?.figure?.canCrush(cell);
             });
     }
 
@@ -93,12 +99,61 @@ export class Board {
         this.getAllCells()
             .forEach((cell, i, arr) => {
                 if (cell.figure?.color === order) {
-                    const isForward = arr.some(c => cell.figure?.canCrush(c, this));
+                    const isForward = arr.some(c => cell.figure?.canCrush(c));
                     cell.isForward = isForward;
                 } else {
                     cell.isForward = false;
                 }
             });
+    }
+
+    public getCellAutoMove(order: Colors, level: Level): Array<Cell> {
+        let selectedCell = null as null | Cell;
+        let targetCell = null as null | Cell;
+
+        const allCells = this.getAllCells();
+        const myCellsFigure = allCells.filter(cell => cell.figure?.color === order);
+        const myCellsForward = myCellsFigure.filter(cell => cell.isForward);
+
+        console.log('myCellsForward.length', myCellsForward.length);
+
+        if (myCellsForward.length) {
+            const randomIndex = myCellsForward.length > 1
+                ? getRandomFromTo(0, myCellsForward.length - 1)
+                : 0;
+            selectedCell = myCellsForward[randomIndex];
+            console.log('randomIndex', randomIndex);
+
+            this.getCellAvailable(selectedCell);
+            const availableCells = this.getAllCells().filter(cell => cell.isAvailable);
+            console.log('available.length', availableCells.length)
+
+            targetCell = availableCells.length > 1
+                ? availableCells[getRandomFromTo(0, availableCells.length - 1)]
+                : availableCells[0];
+
+        } else {
+            const myCellsFigureCanMove = myCellsFigure.filter(cell => allCells.some(target => cell.figure?.canMove(target)));
+            const index = myCellsFigureCanMove.length > 1
+                ? getRandomFromTo(0, myCellsFigureCanMove.length - 1)
+                : 0;
+            selectedCell = myCellsFigureCanMove[index];
+
+            this.getCellAvailable(selectedCell);
+            const availableCells = allCells.filter(cell => cell.isAvailable);
+
+            targetCell = availableCells.length > 1
+                ? availableCells[getRandomFromTo(0, availableCells.length - 1)]
+                : availableCells[0];
+        }
+        // alert(`${selectedCell?.x} ${selectedCell?.y}`);
+        // alert(`${targetCell?.x} ${targetCell?.y}`);
+
+        if (selectedCell && targetCell) {
+            return [selectedCell, targetCell];
+        } else {
+            return [];
+        }
     }
 
 }

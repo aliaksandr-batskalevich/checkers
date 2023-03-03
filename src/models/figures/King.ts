@@ -19,7 +19,7 @@ export class King extends Figure {
         this.logo = color === Colors.WHITE ? whiteKingLogo : blackKingLogo;
     }
 
-    canMove(target: Cell, board: Board): boolean {
+    canMove(target: Cell): boolean {
         const preCondition = target.color === Colors.BLACK
             && !target.figure
             // diagonal
@@ -31,23 +31,23 @@ export class King extends Figure {
         const transitCoordinates = getTransitCoordinates(target, this.cell);
         const transitCells = transitCoordinates.map(coordinate => {
             const [x, y] = coordinate;
-            return board.getCell(x, y);
+            return this.cell.board.getCell(x, y);
         });
         const transitCondition = testKingTransitCell(transitCells, this.color);
 
         return transitCondition;
     }
 
-    canCrush(target: Cell, board: Board): boolean {
+    canCrush(target: Cell): boolean {
         const isCourseCondition = Math.abs(target.x - this.cell.x) === Math.abs(target.y - this.cell.y);
         const colorFigureCondition = !!target.figure && target.figure.color !== this.color;
         const nextCellCoordinates = getNextCellAfterCrushedFigure(target, this.cell);
 
         if (isCourseCondition && nextCellCoordinates && colorFigureCondition) {
             const [nextCellX, nextCellY] = nextCellCoordinates;
-            const nextTargetCell = board.getCell(nextCellX, nextCellY);
+            const nextTargetCell = this.cell.board.getCell(nextCellX, nextCellY);
             const freeNextCellCondition = !nextTargetCell.figure;
-            return freeNextCellCondition && this.canMove(nextTargetCell, board);
+            return freeNextCellCondition && this.canMove(nextTargetCell);
 
         } else return false;
     }

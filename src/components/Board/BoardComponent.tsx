@@ -7,7 +7,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {getBoard, getCount, getForwards, getOrder, getSelectedCell, getStatus} from "../../bll/selectors";
 import {setBoard} from "../../bll/boardReducer";
 import {Colors} from "../../models/Colors";
-import {setCount, setOrder, setSelectedCell, setStatus, Status} from "../../bll/appReducer";
+import {Level, setCount, setOrder, setSelectedCell, setStatus, Status} from "../../bll/appReducer";
 
 
 export const BoardComponent = () => {
@@ -15,10 +15,10 @@ export const BoardComponent = () => {
     const dispatch = useDispatch();
 
     const count = useSelector(getCount);
-    const board = useSelector(getBoard);
     const order = useSelector(getOrder);
     const status = useSelector(getStatus);
     const selectedCell = useSelector(getSelectedCell);
+    const board = useSelector(getBoard);
     const forwards = useSelector(getForwards);
 
     const updateBoard = () => {
@@ -28,6 +28,14 @@ export const BoardComponent = () => {
 
             if (selectedCell?.isForward) {
                 dispatch(setStatus(Status.CRUSH));
+                if (order === Colors.WHITE) {
+                    const [selectedCell, targetCell] = board.getCellAutoMove(order, Level.LOW);
+                    if (selectedCell && targetCell) {
+                        selectedCell.moveFigure(targetCell);
+                        dispatch(setStatus(Status.MOVE));
+                        setSelectedCellHandler(targetCell);
+                    }
+                }
             } else {
                 dispatch(setStatus(Status.WAIT));
                 changeOrder();
@@ -76,11 +84,23 @@ export const BoardComponent = () => {
     };
 
 
+
     useEffect(() => {
         board.getCellAvailable(selectedCell);
         board.getCellForward(order);
         updateBoard();
     }, [selectedCell]);
+
+    useEffect(() => {
+        if (order === Colors.WHITE) {
+            const [selectedCell, targetCell] = board.getCellAutoMove(order, Level.LOW);
+            if (selectedCell && targetCell) {
+                selectedCell.moveFigure(targetCell);
+                dispatch(setStatus(Status.MOVE));
+                setSelectedCellHandler(targetCell);
+            }
+        }
+    }, [order])
 
 
     const cellsToRender = board._cells.map(row =>

@@ -28,11 +28,11 @@ export class Figure {
         this.name = FiguresNames.FIGURE;
     }
 
-    canMove(target: Cell, board: Board): boolean {
+    canMove(target: Cell): boolean {
         return false;
     }
 
-    moveFigure(target: Cell, board: Board) {
+    moveFigure(target: Cell) {
 
         // crush Figure
         const transitCoordinates = getTransitCoordinates(target, this.cell);
@@ -40,7 +40,7 @@ export class Figure {
         transitCoordinates
             .map(coordinate => {
             let [x, y] = coordinate;
-            return board.getCell(x, y);
+            return this.cell.board.getCell(x, y);
         })
             .forEach(cell => {
             cell.figure?.unMount();
@@ -50,7 +50,7 @@ export class Figure {
         this.cell = target;
     }
 
-    canCrush(target: Cell, board: Board): boolean {
+    canCrush(target: Cell): boolean {
         return false;
     }
 

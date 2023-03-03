@@ -2,11 +2,18 @@ import {Cell} from "../models/Cell";
 import {Colors} from "../models/Colors";
 
 export type AppActionsType = ReturnType<typeof setInitApp>
+    | ReturnType<typeof changeLevel>
     | ReturnType<typeof setIsWinner>
     | ReturnType<typeof setCount>
     | ReturnType<typeof setOrder>
     | ReturnType<typeof setStatus>
     | ReturnType<typeof setSelectedCell>;
+
+export enum Level {
+    LOW = 'low',
+    MIDDLE = 'middle',
+    HEIGHT = 'height',
+}
 
 export enum Status {
     WAIT = 'wait',
@@ -15,6 +22,7 @@ export enum Status {
 }
 
 type AppStateType = {
+    level: Level
     isWinner: null | Colors
     isAppInit: boolean
     count: Array<number>
@@ -24,6 +32,7 @@ type AppStateType = {
 };
 
 const appInitState: AppStateType = {
+    level: Level.LOW,
     isWinner: null,
     isAppInit: false,
     count: [12, 12],
@@ -36,6 +45,8 @@ export const appReducer = (state: AppStateType = appInitState, action: AppAction
     switch (action.type) {
         case 'INIT_APP':
             return {...state, isAppInit: true};
+        case 'CHANGE_LEVEL':
+            return {...state, ...action.payload};
         case 'SET_IS_WINNER':
             return {...state, ...action.payload};
         case 'SET_COUNT':
@@ -54,6 +65,13 @@ export const appReducer = (state: AppStateType = appInitState, action: AppAction
 export const setInitApp = () => {
     return {
         type: 'INIT_APP'
+    } as const;
+};
+
+export const changeLevel = (level: Level) => {
+    return {
+        type: 'CHANGE_LEVEL',
+        payload: {level}
     } as const;
 };
 

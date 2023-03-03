@@ -16,7 +16,7 @@ export class Man extends Figure {
         this.logo = color === Colors.WHITE ? whiteManLogo : blackManLogo;
     }
 
-    canMove(target: Cell, board: Board): boolean {
+    canMove(target: Cell): boolean {
         if (target.color === Colors.WHITE) return false;
 
         const conditionCourseOneWhite = target.y === this.cell.y + 1;
@@ -37,7 +37,7 @@ export class Man extends Figure {
 
         const transitCoordinates = getTransitCoordinates(target, this.cell);
         const [x, y] = transitCoordinates[0];
-        const cell = board.getCell(x, y);
+        const cell = this.cell.board.getCell(x, y);
 
         const conditionMoveAfterCrush = cell.figure && cell.figure.color !== this.color;
 
@@ -45,13 +45,13 @@ export class Man extends Figure {
 
     }
 
-    canCrush(target: Cell, board: Board): boolean {
+    canCrush(target: Cell): boolean {
         const colorCondition = !!target.figure && target.figure.color !== this.color;
         const nextCell = getNextCellAfterCrushedFigure(target, this.cell);
         if (!nextCell) return false;
 
         const [nextCellX, nextCellY] = nextCell;
-        const nextTargetCell = board.getCell(nextCellX, nextCellY);
+        const nextTargetCell = this.cell.board.getCell(nextCellX, nextCellY);
         const freeNextCellCondition = !nextTargetCell.figure;
 
         const condition = colorCondition

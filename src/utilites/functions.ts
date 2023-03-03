@@ -31,3 +31,7 @@ export const testKingTransitCell = (transitCells: Array<Cell>, thisColor: Colors
             && cell.figure
             && arr[i + 1].figure)
         || cell.figure?.color === thisColor), true);
+
+// to generate random number
+
+export const getRandomFromTo = (min: number, max: number) => Math.floor(min + Math.random() * (max - min + 1));

@@ -1,5 +1,5 @@
 import {Colors} from "./Colors";
-import {Figure} from "./figures/Figure";
+import {Figure, FiguresNames} from "./figures/Figure";
 import {Board} from "./Board";
 import {v1} from "uuid";
 import {King} from "./figures/King";
@@ -31,7 +31,7 @@ export class Cell {
 
     moveFigure(target: Cell) {
         if (this.figure) {
-            this.figure.moveFigure(target, this.board);
+            this.figure.moveFigure(target);
             target.figure = this.figure;
             this.figure = null;
 

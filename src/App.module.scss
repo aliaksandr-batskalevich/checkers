@@ -46,7 +46,9 @@
   }
 }
 
-.contentWinnerWrapper {
-  filter: blur(5px);
-  pointer-events: none;
+.contentWinnerWrapper > div {
+  &:nth-child(2) {
+    filter: blur(5px);
+    pointer-events: none;
+  }
 }
