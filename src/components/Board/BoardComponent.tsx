@@ -27,8 +27,8 @@ export const BoardComponent = () => {
         setSelectedCellHandler(targetCell);
     };
 
-    const autoMoveHandler = (color: Colors) => {
-        const [selectedCell, targetCell] = board.getCellAutoMove(order, Level.LOW);
+    const autoMoveHandler = (color: Colors, crushingCell: Cell | null = null) => {
+        const [selectedCell, targetCell] = board.getCellAutoMove(order, Level.LOW, crushingCell);
         if (selectedCell && targetCell) {
             moveToTargetCell(selectedCell, targetCell);
         } else {
@@ -46,7 +46,7 @@ export const BoardComponent = () => {
             if (selectedCell?.isForward) {
                 dispatch(setStatus(Status.CRUSH));
                 if (order === Colors.WHITE) {
-                    autoMoveHandler(Colors.WHITE);
+                    autoMoveHandler(Colors.WHITE, selectedCell);
                 }
             } else {
                 dispatch(setStatus(Status.WAIT));
