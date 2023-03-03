@@ -129,7 +129,7 @@ export class Board {
 
         targetCell = availableCells[randomIndexMaker(availableCells.length - 1)];
 
-        alert(`${selectedCell?.x} ${selectedCell?.y} - ${targetCell?.x} ${targetCell?.y} ${myCellsForward.length > 0}`);
+        // alert(`${selectedCell?.x} ${selectedCell?.y} - ${targetCell?.x} ${targetCell?.y} ${myCellsForward.length > 0}`);
 
         if (selectedCell && targetCell) {
             return [selectedCell, targetCell];
