@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/checkers/static/css/main.9f37a916.css",
-    "main.js": "/checkers/static/js/main.65adeea3.js",
+    "main.js": "/checkers/static/js/main.7b21b8d0.js",
     "static/js/787.96d4a48f.chunk.js": "/checkers/static/js/787.96d4a48f.chunk.js",
     "static/media/border-background.jpg": "/checkers/static/media/border-background.5c8c6b7a68b38443a7e1.jpg",
     "static/media/black-king.png": "/checkers/static/media/black-king.106c7587f69098edd2ef.png",
@@ -9,11 +9,11 @@
     "static/media/black-man.png": "/checkers/static/media/black-man.8eeb8f7b8d08f817d5f5.png",
     "index.html": "/checkers/index.html",
     "main.9f37a916.css.map": "/checkers/static/css/main.9f37a916.css.map",
-    "main.65adeea3.js.map": "/checkers/static/js/main.65adeea3.js.map",
+    "main.7b21b8d0.js.map": "/checkers/static/js/main.7b21b8d0.js.map",
     "787.96d4a48f.chunk.js.map": "/checkers/static/js/787.96d4a48f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9f37a916.css",
-    "static/js/main.65adeea3.js"
+    "static/js/main.7b21b8d0.js"
   ]
 }
