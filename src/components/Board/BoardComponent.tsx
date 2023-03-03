@@ -21,16 +21,16 @@ export const BoardComponent = () => {
     const board = useSelector(getBoard);
     const forwards = useSelector(getForwards);
 
-    const moveToTargetCell = (selectedCell: Cell, targetCell: Cell) => {
+    const moveFigureToTargetCell = (selectedCell: Cell, targetCell: Cell) => {
         selectedCell.moveFigure(targetCell);
         dispatch(setStatus(Status.MOVE));
         setSelectedCellHandler(targetCell);
     };
 
-    const autoMoveHandler = (color: Colors, crushingCell: Cell | null = null) => {
-        const [selectedCell, targetCell] = board.getCellAutoMove(order, Level.LOW, crushingCell);
-        if (selectedCell && targetCell) {
-            moveToTargetCell(selectedCell, targetCell);
+    const autoMoveHandler = (color: Colors) => {
+        const [cell, targetCell] = board.getCellAutoMove(order, selectedCell, Level.LOW);
+        if (cell && targetCell) {
+            moveFigureToTargetCell(cell, targetCell);
         } else {
             dispatch(setIsWinner(color === Colors.WHITE
                 ? Colors.BLACK
@@ -46,7 +46,7 @@ export const BoardComponent = () => {
             if (selectedCell?.isForward) {
                 dispatch(setStatus(Status.CRUSH));
                 if (order === Colors.WHITE) {
-                    autoMoveHandler(Colors.WHITE, selectedCell);
+                    autoMoveHandler(Colors.WHITE);
                 }
             } else {
                 dispatch(setStatus(Status.WAIT));
@@ -88,7 +88,7 @@ export const BoardComponent = () => {
 
         // move to target cell
         if (cell.isAvailable && selectedCell) {
-            moveToTargetCell(selectedCell, cell);
+            moveFigureToTargetCell(selectedCell, cell);
         }
 
     };

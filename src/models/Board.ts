@@ -107,23 +107,28 @@ export class Board {
             });
     }
 
-    public getCellAutoMove(color: Colors, level: Level, crushingCell: Cell | null): Array<Cell> {
+    public getCellAutoMove(color: Colors, crushingCell: Cell | null, level: Level): Array<Cell> {
+
         let selectedCell = null as null | Cell;
         let targetCell = null as null | Cell;
 
         const allCells = this.getAllCells();
-        const myCellsFigure = allCells.filter(cell => cell.figure?.color === color);
-        const freeCell = allCells.filter(cell => !cell.figure);
-        const myCellsForward = myCellsFigure.filter(cell => cell.isForward);
 
         if (crushingCell) {
             selectedCell = crushingCell;
-        } else if (myCellsForward.length) {
-            selectedCell = myCellsForward[randomIndexMaker(myCellsForward.length - 1)];
         } else {
-            const myCellsFigureCanMove = myCellsFigure.filter(myCellFigure => freeCell.some(target => myCellFigure.figure?.canMove(target)));
-            selectedCell = myCellsFigureCanMove[randomIndexMaker(myCellsFigureCanMove.length - 1)];
+            const myCellsFigure = allCells.filter(cell => cell.figure?.color === color);
+            const myCellsForward = myCellsFigure.filter(cell => cell.isForward);
+            const freeCell = allCells.filter(cell => !cell.figure);
+
+            if (myCellsForward.length) {
+                selectedCell = myCellsForward[randomIndexMaker(myCellsForward.length - 1)];
+            } else {
+                const myCellsFigureCanMove = myCellsFigure.filter(myCellFigure => freeCell.some(target => myCellFigure.figure?.canMove(target)));
+                selectedCell = myCellsFigureCanMove[randomIndexMaker(myCellsFigureCanMove.length - 1)];
+            }
         }
+
         this.getCellAvailable(selectedCell);
         const availableCells = allCells.filter(cell => cell.isAvailable);
 
