@@ -4,16 +4,37 @@ import {v1} from "uuid";
 import {CellComponent} from "./Cell/CellComponent";
 import {Cell} from "../../models/Cell";
 import {useDispatch, useSelector} from "react-redux";
-import {getBoard, getCount, getForwards, getOrder, getSelectedCell, getStatus} from "../../bll/selectors";
+import {
+    getBoard,
+    getCount,
+    getForwards,
+    getGameType,
+    getLevel,
+    getOrder,
+    getSelectedCell,
+    getStatus
+} from "../../bll/selectors";
 import {setBoard} from "../../bll/boardReducer";
 import {Colors} from "../../models/Colors";
-import {Level, setCount, setIsWinner, setOrder, setSelectedCell, setStatus, Status} from "../../bll/appReducer";
+import {
+    GameType,
+    Level,
+    setCount,
+    setIsWinner,
+    setOrder,
+    setSelectedCell,
+    setStatus,
+    Status
+} from "../../bll/appReducer";
 
 
 export const BoardComponent = () => {
 
+
     const dispatch = useDispatch();
 
+    const gameType = useSelector(getGameType);
+    const level = useSelector(getLevel);
     const count = useSelector(getCount);
     const order = useSelector(getOrder);
     const status = useSelector(getStatus);
@@ -28,7 +49,7 @@ export const BoardComponent = () => {
     };
 
     const autoMoveHandler = (color: Colors) => {
-        const [cell, targetCell] = board.getCellAutoMove(order, selectedCell, Level.LOW);
+        const [cell, targetCell] = board.getCellAutoMove(order, selectedCell, level);
         if (cell && targetCell) {
             moveFigureToTargetCell(cell, targetCell);
         } else {
@@ -44,8 +65,8 @@ export const BoardComponent = () => {
         if (count[0] + count[1] !== updatedCount[0] + updatedCount[1]) {
 
             if (selectedCell?.isForward) {
-                dispatch(setStatus(Status.CRUSH));
-                if (order === Colors.WHITE) {
+                dispatch(setStatus(Status.CRASH));
+                if (order === Colors.WHITE && gameType === GameType.ONE) {
                     autoMoveHandler(Colors.WHITE);
                 }
             } else {
@@ -102,7 +123,7 @@ export const BoardComponent = () => {
     }, [selectedCell]);
 
     useEffect(() => {
-        if (order === Colors.WHITE) {
+        if (order === Colors.WHITE && gameType === GameType.ONE) {
             autoMoveHandler(Colors.WHITE);
         }
     }, [order])
@@ -120,12 +141,12 @@ export const BoardComponent = () => {
     );
 
     // arrays for app
-    // const lettersArr = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', ''];
-    // const numbersArr = [1, 2, 3, 4, 5, 6, 7, 8];
+    const lettersArr = ['', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', ''];
+    const numbersArr = [1, 2, 3, 4, 5, 6, 7, 8];
 
     // markUpArrays for development
-    const lettersArr = ['', '0', '1', '2', '3', '4', '5', '6', '7', ''];
-    const numbersArr = [7, 6, 5, 4, 3, 2, 1, 0];
+    // const lettersArr = ['', '0', '1', '2', '3', '4', '5', '6', '7', ''];
+    // const numbersArr = [7, 6, 5, 4, 3, 2, 1, 0];
 
     const lettersToRender = lettersArr.map((l, index) => <div key={index}>{l}</div>);
     const numbersToRender = numbersArr.map((num, index) => <div key={index}>{num}</div>);

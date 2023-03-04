@@ -1,0 +1,11 @@
+@import "/src/difinitions";
+
+.button {
+  padding: 2px 10px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+}

@@ -16,6 +16,7 @@
     "@types/reselect": "^2.2.0",
     "@types/sass": "^1.43.1",
     "@types/uuid": "^9.0.1",
+    "formik": "^2.2.9",
     "gh": "^2.8.9",
     "gh-pages": "^5.0.0",
     "pages": "^0.0.16",

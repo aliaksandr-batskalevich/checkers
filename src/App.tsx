@@ -4,13 +4,17 @@ import {BoardComponent} from "./components/Board/BoardComponent";
 import {Board} from "./models/Board";
 import {useDispatch, useSelector} from "react-redux";
 import {setBoard} from "./bll/boardReducer";
-import {setCount, setInitApp, setIsWinner, setOrder, setStatus, Status} from "./bll/appReducer";
+import {setCount, setIsWinner, setOrder, setStatus, Status} from "./bll/appReducer";
 import {Colors} from "./models/Colors";
-import {ScoreBoard} from "./components/ScoreBoard";
-import {getCount, getIsWinner, getOrder} from "./bll/selectors";
+import {ScoreBoard} from "./components/ScoreBoard/ScoreBoard";
+import {getCount, getGameType, getIsAppInit, getIsWinner, getOrder} from "./bll/selectors";
+import {WinnerMessage} from "./components/Messages/WinnerMessage/WinnerMessage";
+import {StartMessage} from "./components/Messages/StartMessage/StartMessage";
 
 function App() {
 
+    const gameType = useSelector(getGameType);
+    const isAppInit = useSelector(getIsAppInit);
     const isWinner = useSelector(getIsWinner);
     const order = useSelector(getOrder);
     const count = useSelector(getCount);
@@ -30,29 +34,42 @@ function App() {
         dispatch(setStatus(Status.WAIT));
     };
 
-    useEffect(() => {
-        restartGame();
-        dispatch(setInitApp());
-    }, []);
+    const setWinnerHandler = (winner: Colors) => {
+        dispatch(setIsWinner(winner));
+    };
 
     useEffect(() => {
-        count[0] === 0 && dispatch(setIsWinner(Colors.BLACK));
-        count[1] === 0 && dispatch(setIsWinner(Colors.WHITE));
+        !isAppInit && restartGame();
+    }, [isAppInit]);
+
+    useEffect(() => {
+        count[0] === 0 && setWinnerHandler(Colors.BLACK);
+        count[1] === 0 && setWinnerHandler(Colors.WHITE);
     }, [count[0], count[1]]);
 
-    const contentWinnerWrapperClassName = isWinner ? s.contentWinnerWrapper : '';
+    const contentWinnerWrapperClassName = isWinner || !isAppInit ? s.contentBlur : '';
 
     return (
         <div className={s.appWrapper}>
-            <div className={`${s.contentWrapper}  ${contentWinnerWrapperClassName}`}>
-                <ScoreBoard color={Colors.WHITE} order={order} count={count}/>
+            <div className={`${s.contentWrapper} ${contentWinnerWrapperClassName}`}>
+                <ScoreBoard
+                    gameType={gameType}
+                    color={Colors.WHITE}
+                    order={order}
+                    count={count}
+                    setWinner={setWinnerHandler}
+                />
                 <BoardComponent/>
-                <ScoreBoard color={Colors.BLACK} order={order} count={count}/>
+                <ScoreBoard
+                    gameType={gameType}
+                    color={Colors.BLACK}
+                    order={order}
+                    count={count}
+                    setWinner={setWinnerHandler}
+                />
             </div>
-            {isWinner && <div className={s.messageWrapper}>
-                <h2>{`${isWinner.toUpperCase()} won!`}</h2>
-                <button onClick={restartGame}>Restart the game</button>
-            </div>}
+            {isWinner && <WinnerMessage winner={isWinner} restartGame={restartGame}/>}
+            {!isAppInit && <StartMessage/>}
         </div>
     );
 }

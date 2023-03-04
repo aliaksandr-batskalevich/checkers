@@ -1,5 +1,5 @@
 import {RootStateType} from "./store";
-import {Status} from "./appReducer";
+import {GameType, Level, Status} from "./appReducer";
 import {Board} from "../models/Board";
 import {Cell} from "../models/Cell";
 import {Colors} from "../models/Colors";
@@ -7,6 +7,8 @@ import {createSelector} from "reselect";
 
 // app
 export const getIsAppInit = (state: RootStateType): boolean => state.app.isAppInit;
+export const getGameType = (state: RootStateType): GameType => state.app.gameType;
+export const getLevel = (state: RootStateType): Level => state.app.level;
 export const getIsWinner = (state: RootStateType): null | Colors => state.app.isWinner;
 export const getCount = (state: RootStateType): Array<number> => state.app.count;
 export const getOrder = (state: RootStateType): Colors => state.app.order;

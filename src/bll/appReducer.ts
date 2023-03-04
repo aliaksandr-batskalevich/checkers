@@ -2,7 +2,8 @@ import {Cell} from "../models/Cell";
 import {Colors} from "../models/Colors";
 
 export type AppActionsType = ReturnType<typeof setInitApp>
-    | ReturnType<typeof changeLevel>
+    | ReturnType<typeof setGameType>
+    | ReturnType<typeof setLevel>
     | ReturnType<typeof setIsWinner>
     | ReturnType<typeof setCount>
     | ReturnType<typeof setOrder>
@@ -12,19 +13,25 @@ export type AppActionsType = ReturnType<typeof setInitApp>
 export enum Level {
     LOW = 'low',
     MIDDLE = 'middle',
-    HEIGHT = 'height',
+    HIGH = 'high',
 }
 
 export enum Status {
     WAIT = 'wait',
     MOVE = 'move',
-    CRUSH = 'crush',
+    CRASH = 'crash',
+}
+
+export enum GameType {
+    ONE = 'one',
+    TWO= 'two',
 }
 
 type AppStateType = {
+    isAppInit: boolean
+    gameType: GameType
     level: Level
     isWinner: null | Colors
-    isAppInit: boolean
     count: Array<number>
     order: Colors
     status: Status
@@ -32,9 +39,10 @@ type AppStateType = {
 };
 
 const appInitState: AppStateType = {
+    isAppInit: false,
+    gameType: GameType.ONE,
     level: Level.LOW,
     isWinner: null,
-    isAppInit: false,
     count: [12, 12],
     order: Colors.BLACK,
     status: Status.WAIT,
@@ -44,7 +52,9 @@ const appInitState: AppStateType = {
 export const appReducer = (state: AppStateType = appInitState, action: AppActionsType): AppStateType => {
     switch (action.type) {
         case 'INIT_APP':
-            return {...state, isAppInit: true};
+            return {...state, ...action.payload};
+        case 'SET_GAME_TYPE':
+            return {...state, ...action.payload};
         case 'CHANGE_LEVEL':
             return {...state, ...action.payload};
         case 'SET_IS_WINNER':
@@ -62,13 +72,21 @@ export const appReducer = (state: AppStateType = appInitState, action: AppAction
     }
 }
 
-export const setInitApp = () => {
+export const setInitApp = (isAppInit: boolean) => {
     return {
-        type: 'INIT_APP'
+        type: 'INIT_APP',
+        payload: {isAppInit}
     } as const;
 };
 
-export const changeLevel = (level: Level) => {
+export const setGameType = (gameType: GameType) => {
+    return {
+        type: 'SET_GAME_TYPE',
+        payload: {gameType}
+    } as const;
+};
+
+export const setLevel = (level: Level) => {
     return {
         type: 'CHANGE_LEVEL',
         payload: {level}
