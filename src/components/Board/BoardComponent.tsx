@@ -16,16 +16,7 @@ import {
 } from "../../bll/selectors";
 import {setBoard} from "../../bll/boardReducer";
 import {Colors} from "../../models/Colors";
-import {
-    GameType,
-    Level,
-    setCount,
-    setIsWinner,
-    setOrder,
-    setSelectedCell,
-    setStatus,
-    Status
-} from "../../bll/appReducer";
+import {GameType, setCount, setIsWinner, setOrder, setSelectedCell, setStatus, Status} from "../../bll/appReducer";
 
 
 export const BoardComponent = () => {
@@ -41,6 +32,7 @@ export const BoardComponent = () => {
     const selectedCell = useSelector(getSelectedCell);
     const board = useSelector(getBoard);
     const forwards = useSelector(getForwards);
+
 
     const moveFigureToTargetCell = (selectedCell: Cell, targetCell: Cell) => {
         selectedCell.moveFigure(targetCell);
@@ -126,7 +118,7 @@ export const BoardComponent = () => {
         if (order === Colors.WHITE && gameType === GameType.ONE) {
             autoMoveHandler(Colors.WHITE);
         }
-    }, [order])
+    }, [order]);
 
 
     const cellsToRender = board._cells.map(row =>

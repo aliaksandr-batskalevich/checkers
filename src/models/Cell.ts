@@ -1,5 +1,5 @@
 import {Colors} from "./Colors";
-import {Figure, FiguresNames} from "./figures/Figure";
+import {Figure} from "./figures/Figure";
 import {Board} from "./Board";
 import {v1} from "uuid";
 import {King} from "./figures/King";

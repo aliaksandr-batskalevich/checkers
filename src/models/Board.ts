@@ -3,6 +3,29 @@ import {Colors} from "./Colors";
 import {Man} from "./figures/Man";
 import {getTransitCoordinates, randomIndexMaker} from "../utilites/functions";
 import {Level} from "../bll/appReducer";
+import {FiguresNames} from "./figures/Figure";
+import {King} from "./figures/King";
+
+enum AutoMoveRating {
+    CRASH = 2,                          // crashFigure - +1;
+    ANOTHER_DANGER_COUNT_UP = 1,        // for anotherDangerCountUp - +1;
+    MY_DANGER_COUNT_UP = -1,            // for myDangerCountUp - -1;
+    MY_DANGER_COUNT_DOWN = 1,           // for myDangerCountDown - +2;
+    SAVE_FORWARD = 2,                   // selectedCell === forwardCell - +2;
+}
+
+type TestMoveResultType = {
+    selectedCell: Cell
+    target: Cell
+    rating: number
+};
+
+type FigureForwardFreeCellsType = {
+    myCellsFigure: Array<Cell>
+    anotherCellsFigure: Array<Cell>
+    myCellsForward: Array<Cell>
+    freeCell: Array<Cell>
+}
 
 
 export class Board {
@@ -95,6 +118,13 @@ export class Board {
             });
     }
 
+    _getAllCellDanger(selectedCell: Cell | null) {
+        this.getAllCells()
+            .forEach(cell => {
+                if (!cell.isDanger) cell.isDanger = !!selectedCell?.figure?.canCrush(cell);
+            });
+    }
+
     public getCellForward(order: Colors) {
         this.getAllCells()
             .forEach((cell, i, arr) => {
@@ -107,39 +137,171 @@ export class Board {
             });
     }
 
-    public getCellAutoMove(color: Colors, crushingCell: Cell | null, level: Level): Array<Cell> {
+    _getTestBoard() {
+        const newTestBoard = new Board();
+        newTestBoard.initCells();
+
+        this.getAllCells().forEach(cell => {
+            if (cell.figure) {
+                const newFigureCell = newTestBoard.getCell(cell.x, cell.y);
+                const color = cell.figure.color;
+                const name = cell.figure.name;
+                newFigureCell.figure = name === FiguresNames.MAN
+                    ? new Man(color, newFigureCell)
+                    : new King(color, newFigureCell);
+            }
+        });
+
+        return newTestBoard;
+    }
+
+    _getMyDangerCount(myColor: Colors): number {
+        const newTestBoard = this._getTestBoard();
+        newTestBoard.getAllCells().forEach(cell => {
+            let anotherColor = myColor === Colors.WHITE ? Colors.BLACK : Colors.WHITE;
+            if (cell.figure?.color === anotherColor) {
+                newTestBoard._getAllCellDanger(cell);
+            }
+        });
+        return newTestBoard.getAllCells().filter(cell => cell.isDanger).length;
+    }
+
+    _getAnotherDangerCount(myColor: Colors): number {
+        const newTestBoard = this._getTestBoard();
+        newTestBoard.getAllCells().forEach(cell => {
+            if (cell.figure?.color === myColor) {
+                newTestBoard._getAllCellDanger(cell);
+            }
+        });
+        return newTestBoard.getAllCells().filter(cell => cell.isDanger).length;
+    }
+
+    _getTestMoveResult(myColor: Colors, selectedCell: Cell, target: Cell): TestMoveResultType {
+        let rating = 0;
+
+        const myDangerCount = this._getMyDangerCount(myColor);
+        const anotherDangerCount = this._getAnotherDangerCount(myColor);
+        const {anotherCellsFigure} = this._getFigureForwardFreeCells(myColor);
+
+        const newTestBoard = this._getTestBoard();
+        const newSelectedCell = newTestBoard.getCell(selectedCell.x, selectedCell.y);
+        const newTargetCell = newTestBoard.getCell(target.x, target.y);
+        newSelectedCell.moveFigure(newTargetCell);
+        newTestBoard.getCellForward(myColor);
+
+        const newMyDangerCount = newTestBoard._getMyDangerCount(myColor);
+        const newAnotherDangerCount = newTestBoard._getAnotherDangerCount(myColor);
+        const newAnotherCellsFigure = newTestBoard._getFigureForwardFreeCells(myColor).anotherCellsFigure;
+
+        if (newAnotherCellsFigure.length < anotherCellsFigure.length) rating += AutoMoveRating.CRASH;
+        if (newAnotherDangerCount > anotherDangerCount) rating += AutoMoveRating.ANOTHER_DANGER_COUNT_UP;
+        if (newMyDangerCount > myDangerCount) rating += AutoMoveRating.MY_DANGER_COUNT_UP;
+        if (newMyDangerCount < myDangerCount) rating += AutoMoveRating.MY_DANGER_COUNT_DOWN;
+        if (newMyDangerCount < myDangerCount) rating += AutoMoveRating.MY_DANGER_COUNT_DOWN;
+        if (selectedCell.isForward && newTargetCell.isForward) rating += AutoMoveRating.SAVE_FORWARD;
+
+        return {selectedCell, target, rating};
+    }
+
+    _getFigureForwardFreeCells(myColor: Colors): FigureForwardFreeCellsType {
+        const allCells = this.getAllCells();
+        const myCellsFigure = allCells.filter(cell => cell.figure?.color === myColor);
+        const anotherCellsFigure = allCells.filter(cell => cell.figure?.color === (myColor === Colors.WHITE ? Colors.BLACK : Colors.WHITE));
+        const myCellsForward = myCellsFigure.filter(cell => cell.isForward);
+        const freeCell = allCells.filter(cell => !cell.figure);
+
+        return {myCellsFigure, anotherCellsFigure, myCellsForward, freeCell};
+    }
+
+    public getCellAutoMove(color: Colors, crashingCell: Cell | null, level: Level): Array<Cell> {
 
         let selectedCell = null as null | Cell;
         let targetCell = null as null | Cell;
-
         const allCells = this.getAllCells();
 
-        if (crushingCell) {
-            selectedCell = crushingCell;
-        } else {
-            const myCellsFigure = allCells.filter(cell => cell.figure?.color === color);
-            const myCellsForward = myCellsFigure.filter(cell => cell.isForward);
-            const freeCell = allCells.filter(cell => !cell.figure);
+        switch (level) {
 
-            if (myCellsForward.length) {
-                selectedCell = myCellsForward[randomIndexMaker(myCellsForward.length - 1)];
-            } else {
-                const myCellsFigureCanMove = myCellsFigure.filter(myCellFigure => freeCell.some(target => myCellFigure.figure?.canMove(target)));
-                selectedCell = myCellsFigureCanMove[randomIndexMaker(myCellsFigureCanMove.length - 1)];
+            case Level.LOW: {
+                if (crashingCell) {
+                    selectedCell = crashingCell;
+                } else {
+                    const {myCellsFigure, myCellsForward, freeCell} = this._getFigureForwardFreeCells(color);
+
+                    if (myCellsForward.length) {
+                        selectedCell = myCellsForward[randomIndexMaker(myCellsForward.length - 1)];
+                    } else {
+                        const myCellsFigureCanMove = myCellsFigure.filter(myCellFigure => freeCell.some(target => myCellFigure.figure?.canMove(target)));
+                        selectedCell = myCellsFigureCanMove[randomIndexMaker(myCellsFigureCanMove.length - 1)];
+                    }
+                }
+
+                this.getCellAvailable(selectedCell);
+                const availableCells = allCells.filter(cell => cell.isAvailable);
+
+                targetCell = availableCells[randomIndexMaker(availableCells.length - 1)];
+
+                // alert(`${selectedCell?.x} ${selectedCell?.y} - ${targetCell?.x} ${targetCell?.y} ${myCellsForward.length > 0}`);
+
+                return [selectedCell, targetCell];
             }
-        }
 
-        this.getCellAvailable(selectedCell);
-        const availableCells = allCells.filter(cell => cell.isAvailable);
+            case Level.MIDDLE: {
+                const moveOptions = [] as Array<TestMoveResultType>
 
-        targetCell = availableCells[randomIndexMaker(availableCells.length - 1)];
+                const addOptions = (selectedCellOptions: Array<Cell>) => {
+                    selectedCellOptions.forEach(selectedCell => {
+                        const newTestBoard = this._getTestBoard();
+                        newTestBoard.getCellAvailable(selectedCell);
+                        newTestBoard.getAllCells().filter(cell => cell.isAvailable).forEach(target => {
+                            let newForward = newTestBoard.getCell(selectedCell.x, selectedCell.y);
+                            let result = newTestBoard._getTestMoveResult(color, newForward, target);
 
-        // alert(`${selectedCell?.x} ${selectedCell?.y} - ${targetCell?.x} ${targetCell?.y} ${myCellsForward.length > 0}`);
+                            moveOptions.push({
+                                selectedCell: selectedCell,
+                                target: this.getCell(target.x, target.y),
+                                rating: result.rating
+                            });
+                        });
+                    });
+                };
 
-        if (selectedCell && targetCell) {
-            return [selectedCell, targetCell];
-        } else {
-            return [];
+                if (crashingCell) {
+                    this.getCellAvailable(crashingCell);
+                    this.getAllCells().filter(cell => cell.isAvailable).forEach(target => {
+                        let result = this._getTestMoveResult(color, crashingCell, target);
+
+                        moveOptions.push({
+                            selectedCell: crashingCell,
+                            target: this.getCell(target.x, target.y),
+                            rating: result.rating
+                        });
+                    });
+
+                } else {
+                    const {myCellsFigure, myCellsForward, freeCell} = this._getFigureForwardFreeCells(color);
+
+                    if (myCellsForward.length) {
+                        addOptions(myCellsForward);
+                    } else {
+                        const figuresCanMove = myCellsFigure.filter(cell => freeCell.some(target => cell.figure?.canMove(target)));
+                        addOptions(figuresCanMove);
+                    }
+                }
+
+                if (moveOptions.length) {
+                    const bestMoveOption = moveOptions.sort((a, b) => b.rating - a.rating)[0];
+                    selectedCell = bestMoveOption.selectedCell;
+                    targetCell = bestMoveOption.target;
+
+                    return [selectedCell, targetCell];
+                }
+
+                return [];
+            }
+
+            case Level.HIGH: {
+                return [];
+            }
         }
     }
 

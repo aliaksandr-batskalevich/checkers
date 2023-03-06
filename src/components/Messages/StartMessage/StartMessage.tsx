@@ -6,6 +6,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {useFormik} from "formik";
 import {getGameType, getLevel} from "../../../bll/selectors";
 import {Button} from "../../commons/Button/Button";
+import {v1} from "uuid";
 
 
 export const StartMessage = () => {
@@ -39,7 +40,7 @@ export const StartMessage = () => {
         }
     });
 
-    const radioLevelsToRender = [Level.LOW, Level.MIDDLE, Level.HIGH].map(level => <span className={s.radioElement}>
+    const radioLevelsToRender = [Level.LOW, Level.MIDDLE, Level.HIGH].map(level => <span key={v1()} className={s.radioElement}>
         <input
             id={level}
             type='radio'
@@ -48,7 +49,7 @@ export const StartMessage = () => {
             onChange={formik.handleChange}
             checked={formik.values.level === level}
             // can be changing after create logic for levels
-            disabled={level !== Level.LOW}
+            disabled={level === Level.HIGH}
         />
         <label htmlFor={level}>{level}</label>
     </span>);
@@ -67,7 +68,7 @@ export const StartMessage = () => {
                         value={formik.values.gameType}
                         onChange={formik.handleChange}
                     >
-                        <option value={GameType.ONE} selected>one player</option>
+                        <option value={GameType.ONE}>one player</option>
                         <option value={GameType.TWO}>two players</option>
                     </select>
                 </div>
