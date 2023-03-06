@@ -7,10 +7,10 @@ import {FiguresNames} from "./figures/Figure";
 import {King} from "./figures/King";
 
 enum AutoMoveRating {
-    CRASH = 2,                          // crashFigure - +1;
+    CRASH = 2,                          // crashFigure - +2;
     ANOTHER_DANGER_COUNT_UP = 1,        // for anotherDangerCountUp - +1;
     MY_DANGER_COUNT_UP = -1,            // for myDangerCountUp - -1;
-    MY_DANGER_COUNT_DOWN = 1,           // for myDangerCountDown - +2;
+    MY_DANGER_COUNT_DOWN = 1,           // for myDangerCountDown - +1;
     SAVE_FORWARD = 2,                   // selectedCell === forwardCell - +2;
 }
 
